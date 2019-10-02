@@ -1,0 +1,249 @@
+.page-container {
+  left: 0;
+  right: 0;
+  margin: auto;
+  margin-top: 20px;
+  padding-right: 200px;
+}
+
+@media only screen and (max-width : 992px) {
+  .page-container {
+    padding-left: 0;
+    display: flex !important;
+  }
+}
+
+#navbar {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.center-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.side-by-side {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.side-by-side >* {
+  margin: 0 5px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.margin-sm {
+  margin: 5px;
+}
+
+.margin {
+  margin: 20px;
+}
+
+.button-sm {
+  padding: 0 10px !important;
+}
+
+.pad-sides-sm {
+  padding: 0 8px !important;
+}
+
+#github-link {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid;
+  margin-bottom: 10px;
+}
+
+#overlay, .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#facesContainer canvas {
+  margin: 10px;
+}
+
+/* CUSTOM */
+
+.page-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: white;
+  background-image: url('./hackerloop-loader.gif');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 220px auto;
+  height: 100vh;
+  opacity: 1;
+  z-index: 1;
+  transition: opacity 200ms;
+  pointer-events: none;
+}
+
+.ready .page-loader {
+  opacity: 0;
+}
+
+.page-container {
+  display: none;
+}
+
+.ready .page-container {
+  display: flex;
+}
+
+.video {
+  position: relative;
+}
+
+.video .progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#inputVideo {
+  width: 640px;
+  height: 480px;
+}
+
+.pokerface {
+  width: 640px;
+  background-color: #10e886;
+  font-family: 'upheaval_tt_brkregular', arial;
+  font-size: 5em;
+  text-align: center;
+  color: black;
+  padding: 20px;
+  text-transform: uppercase;
+}
+
+.pokerface.nop {
+  background-color: #f51717;
+}
+
+  .pokerface p {
+    margin: 0;
+  }
+
+  .meter {
+    position: relative;
+    width: 100%;
+    height: 20px;
+    background-color: white;
+  }
+
+    .meter #pokerface-meter {
+      display: block;
+      background-color: black;
+      height: 100%;
+      width: 0%;
+      transition: width 100ms;
+    }
+
+    #threshold {
+      display: block;
+      position: absolute;
+      top: -5px;
+      left: 0;
+      bottom: -5px;
+      background: red;
+      width: 4px;
+    }
+
+    .draggableThreshold {
+      cursor: move;
+    }
+
+.audio-player {
+  display: none;
+}
+
+.settings {
+  display: none;
+}
+
+.detections {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  font-family: 'upheaval_tt_brkregular', arial;
+  font-size: 3em;
+  line-height: 1em;
+  padding: 0 10px;
+}
+
+  .detections ul {
+    margin: 0;
+  }
+
+  .detections li {
+    margin: 0;
+  }
+
+.control {
+  position: absolute;
+  top: -110px ;
+  left: 100%;
+  padding: 0 50px;
+}
+
+.eightbit-btn {
+  background: #92CD41;
+  display: inline-block;
+  position: relative;
+  text-align: center;
+  font-size: 30px;
+  padding: 10px 20px;
+  font-family: 'upheaval_tt_brkregular', cursive;
+  text-decoration: none;
+  color: white;
+  box-shadow: inset -4px -4px 0px 0px #4AA52E;
+}
+  .eightbit-btn:hover,
+  .eightbit-btn:focus {
+    background: #76c442;
+    box-shadow: inset -6px -6px 0px 0px #4AA52E;
+  }
+
+  .eightbit-btn:active {
+    box-shadow: inset 4px 4px 0px 0px #4AA52E;
+  }
+
+  .eightbit-btn:before,
+  .eightbit-btn:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    box-sizing: content-box;
+  }
+
+  .eightbit-btn:before {
+    top: -6px;
+    left: 0;
+    border-top: 6px black solid;
+    border-bottom: 6px black solid;
+  }
+
+  .eightbit-btn:after {
+    left: -6px;
+    top: 0;
+    border-left: 6px black solid;
+    border-right: 6px black solid;
+  }

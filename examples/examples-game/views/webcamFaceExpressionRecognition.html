@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style media="screen">
+  /* FONTS */
+  @font-face {
+      font-family: 'upheaval_tt_brkregular';
+      src: url('./fonts/upheavtt-webfont.woff2') format('woff2'),
+           url('./fonts/upheavtt-webfont.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+
+  }
+  </style>
+  <script src="face-api.js"></script>
+  <script src="js/commons.js"></script>
+  <script src="js/faceDetectionControls.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script
+  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+</head>
+<body>
+  <div class="page-loader"></div>
+
+  <audio id="audio-good" class="audio-player" controls>
+    <source src="./sounds/sound-effect-win.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="audio-bad" class="audio-player" controls>
+    <source src="./sounds/Villagerdeny1.mp3" type="audio/mpeg">
+  </audio>
+
+  <div id="navbar" style="display:none;"></div>
+  <div class="center-content page-container">
+
+    <div class="pokerface">
+      <p>Poker Face</p>
+      <div class="meter" id="threshold-container">
+        <i id="pokerface-meter"></i>
+        <i id="threshold" class="draggableThreshold"></i>
+      </div>
+    </div>
+
+    <div class="video">
+
+      <div class="progress" id="loader">
+        <div class="indeterminate"></div>
+      </div>
+      <div style="position: relative">
+        <video onloadedmetadata="onPlay(this)" id="inputVideo" autoplay muted playsinline></video>
+        <canvas id="overlay" />
+      </div>
+
+      <div class="control">
+        <button class="play eightbit-btn" id="start-game">Play</button>
+      </div>
+
+      <div class="detections">
+        <h4>Detections:</h4>
+        <ul id="detections-list">
+        </ul>
+      </div>
+
+    </div>
+    <a href="#" class="more-settings">Show more options</a>
+    <div class="settings">
+
+      <div class="row">
+        <label for="expressionThreshold">Face expression Threshold % (biggest = hardest):</label>
+        <input value="10" id="expressionThreshold" type="number" min="0" max="100" class="bold">
+      </div>
+
+      <div class="row side-by-side">
+
+        <!-- face_detector_selection_control -->
+        <div id="face_detector_selection_control" class="row input-field" style="margin-right: 20px;">
+          <select id="selectFaceDetector">
+            <option value="ssd_mobilenetv1">SSD Mobilenet V1</option>
+            <option value="tiny_face_detector">Tiny Face Detector</option>
+            <option value="mtcnn">MTCNN</option>
+          </select>
+          <label>Select Face Detector</label>
+        </div>
+        <!-- face_detector_selection_control -->
+
+        <!-- check boxes -->
+        <div class="row" style="width: 220px;">
+          <input type="checkbox" id="hideBoundingBoxesCheckbox" onchange="onChangeHideBoundingBoxes(event)" />
+          <label for="hideBoundingBoxesCheckbox">Hide Bounding Boxes</label>
+        </div>
+        <!-- check boxes -->
+
+        <!-- fps_meter
+        <div id="fps_meter" class="row side-by-side">
+          <div>
+            <label for="time">Time:</label>
+            <input disabled value="-" id="time" type="text" class="bold">
+            <label for="fps">Estimated Fps:</label>
+            <input disabled value="-" id="fps" type="text" class="bold">
+          </div>
+        </div>
+        fps_meter -->
+
+      </div>
+
+
+      <!-- ssd_mobilenetv1_controls -->
+      <span id="ssd_mobilenetv1_controls">
+        <div class="row side-by-side">
+          <div class="row">
+            <label for="minConfidence">Min Confidence:</label>
+            <input disabled value="0.5" id="minConfidence" type="text" class="bold">
+          </div>
+          <button
+            class="waves-effect waves-light btn"
+            onclick="onDecreaseMinConfidence()"
+          >
+            <i class="material-icons left">-</i>
+          </button>
+          <button
+            class="waves-effect waves-light btn"
+            onclick="onIncreaseMinConfidence()"
+          >
+            <i class="material-icons left">+</i>
+          </button>
+        </div>
+      </span>
+      <!-- ssd_mobilenetv1_controls -->
+
+      <!-- tiny_face_detector_controls -->
+      <span id="tiny_face_detector_controls">
+        <div class="row side-by-side">
+          <div class="row input-field" style="margin-right: 20px;">
+            <select id="inputSize">
+              <option value="" disabled selected>Input Size:</option>
+              <option value="128">128 x 128</option>
+              <option value="160">160 x 160</option>
+              <option value="224">224 x 224</option>
+              <option value="320">320 x 320</option>
+              <option value="416">416 x 416</option>
+              <option value="512">512 x 512</option>
+              <option value="608">608 x 608</option>
+            </select>
+            <label>Input Size</label>
+          </div>
+          <div class="row">
+            <label for="scoreThreshold">Score Threshold:</label>
+            <input disabled value="0.5" id="scoreThreshold" type="text" class="bold">
+          </div>
+          <button
+            class="waves-effect waves-light btn"
+            onclick="onDecreaseScoreThreshold()"
+          >
+            <i class="material-icons left">-</i>
+          </button>
+          <button
+            class="waves-effect waves-light btn"
+            onclick="onIncreaseScoreThreshold()"
+          >
+            <i class="material-icons left">+</i>
+          </button>
+        </div>
+      </span>
+      <!-- tiny_face_detector_controls -->
+
+      <!-- mtcnn_controls -->
+      <span id="mtcnn_controls">
+        <div class="row side-by-side">
+          <div class="row">
+            <label for="minFaceSize">Minimum Face Size:</label>
+            <input disabled value="20" id="minFaceSize" type="text" class="bold">
+          </div>
+          <button
+            class="waves-effect waves-light btn"
+            onclick="onDecreaseMinFaceSize()"
+          >
+            <i class="material-icons left">-</i>
+          </button>
+          <button
+            class="waves-effect waves-light btn"
+            onclick="onIncreaseMinFaceSize()"
+          >
+            <i class="material-icons left">+</i>
+          </button>
+        </div>
+      </span>
+      <!-- mtcnn_controls -->
+
+    </div>
+
+  </body>
+
+  <script>
+    let forwardTimes = []
+    let withBoxes = true
+
+    function onChangeHideBoundingBoxes(e) {
+      withBoxes = !$(e.target).prop('checked')
+    }
+
+    function updateTimeStats(timeInMs) {
+      forwardTimes = [timeInMs].concat(forwardTimes).slice(0, 30)
+      const avgTimeInMs = forwardTimes.reduce((total, t) => total + t) / forwardTimes.length
+      $('#time').val(`${Math.round(avgTimeInMs)} ms`)
+      $('#fps').val(`${faceapi.round(1000 / avgTimeInMs)}`)
+    }
+
+    var firstTime = true;
+
+    async function onPlay() {
+
+      if (firstTime) {
+        $('body').addClass('ready');
+        firstTime = false;
+      }
+
+      const videoEl = $('#inputVideo').get(0)
+
+      if(videoEl.paused || videoEl.ended || !isFaceDetectionModelLoaded())
+        return setTimeout(() => onPlay())
+
+
+      const options = getFaceDetectorOptions()
+
+      const ts = Date.now()
+
+      const result = await faceapi.detectSingleFace(videoEl, options).withFaceExpressions()
+
+      updateTimeStats(Date.now() - ts)
+
+      if (result) {
+        const canvas = $('#overlay').get(0)
+        const dims = faceapi.matchDimensions(canvas, videoEl, true)
+
+        const resizedResult = faceapi.resizeResults(result, dims)
+        const minConfidence = 0.05
+        if (withBoxes) {
+          //faceapi.draw.drawDetections(canvas, resizedResult)
+          const drawOptions = {
+            lineWidth: 2,
+            boxColor: winning ? 'rgba(16, 232, 134, 1)' : 'rgba(245, 23, 23, 1)'
+          }
+          const drawBox = new faceapi.draw.DrawBox(resizedResult.detection.box, drawOptions)
+          drawBox.draw(canvas)
+        }
+        faceapi.draw.drawFaceExpressions(canvas, resizedResult, minConfidence)
+
+        pokerface(result);
+      }
+
+      setTimeout(() => onPlay())
+    }
+
+    async function run() {
+      // load face detection and face expression recognition models
+      await changeFaceDetector(TINY_FACE_DETECTOR)
+      await faceapi.loadFaceExpressionModel('/')
+      changeInputSize(224)
+
+      // try to access users webcam and stream the images
+      // to the video element
+      const stream = await navigator.mediaDevices.getUserMedia({ video: {} })
+      const videoEl = $('#inputVideo').get(0)
+      videoEl.srcObject = stream
+    }
+
+    function updateResults() {}
+
+    /* POKER FACE */
+
+    var options = {
+      faceExpressionThreshold: 10
+    }
+
+    function updateOptions() {
+      options.faceExpressionThreshold = $('#expressionThreshold').val() / 100;
+      $('#threshold').css({ left: (options.faceExpressionThreshold*100)+'%' });
+    }
+
+    var last_play = null;
+    var isPlaying = false;
+    var winning = true;
+
+    function pokerface(result) {
+
+      if (!isPlaying)
+        return false;
+      //console.log(result);
+      const expressions = result.expressions;
+      $('#pokerface-meter').width((expressions.neutral*100)+'%');
+      if (expressions.neutral <= options.faceExpressionThreshold) {
+        winning = false;
+        $('.pokerface').addClass('nop');
+        if(last_play != "bad" ) {
+          $('audio#audio-bad')[0].play();
+          last_play = "bad";
+        }
+      }
+      else {
+        winning = true;
+        $('.pokerface').removeClass('nop');
+        if(last_play != "good" ) {
+          $('audio#audio-good')[0].play();
+          last_play = "good";
+        }
+      }
+
+      $('#detections-list').html('');
+      for (var key in expressions) {
+        if (expressions[key] > options.faceExpressionThreshold) {
+          $('#detections-list').append('<li>'+key+'</li>');
+        }
+      }
+
+    }
+
+    function stop() {
+      $('#detections-list').html('');
+      $('#pokerface-meter').width('0%');
+      winning = true;
+      $('.pokerface').removeClass('nop');
+    }
+
+    $(document).ready(function() {
+      renderNavBar('#navbar', 'webcam_face_expression_recognition')
+      initFaceDetectionControls()
+      run()
+
+      updateOptions();
+      $('#expressionThreshold').on('change', updateOptions);
+      $(".draggableThreshold").draggable({
+        axis: "x",
+        containment: "#threshold-container",
+        scroll: false,
+        stop: function() {
+          var posLeft = $(".draggableThreshold").position().left / $('#threshold-container').width() * 100;
+          options.faceExpressionThreshold = Math.round(posLeft) / 100;
+          $('#expressionThreshold').val(Math.round(posLeft));
+        }
+      });
+
+      $(".more-settings").click(function() {
+        $(".settings").slideToggle("fast");
+      });
+
+      $("#start-game").click(function() {
+        if (isPlaying) {
+          stop();
+          isPlaying = false;
+          $(this).text('Play');
+        }
+        else {
+          isPlaying = true;
+          $(this).text('Pause');
+        }
+      });
+
+    });
+  </script>
+</html>
