@@ -5,7 +5,7 @@
 Clone the repository
 
 ``` bash
-cd PkerFaceGame/examples/examples-game
+cd PokerFaceGame/examples/examples-game
 npm i
 npm start
 ```
