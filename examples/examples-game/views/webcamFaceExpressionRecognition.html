@@ -13,6 +13,7 @@
   }
   </style>
   <script src="face-api.js"></script>
+  <script src="js/easytimer.min.js"></script>
   <script src="js/commons.js"></script>
   <script src="js/faceDetectionControls.js"></script>
   <link rel="stylesheet" href="styles.css">
@@ -22,14 +23,20 @@
   src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 </head>
-<body>
+<body class="ready">
   <div class="page-loader"></div>
 
   <audio id="audio-good" class="audio-player" controls>
-    <source src="./sounds/sound-effect-win.mp3" type="audio/mpeg">
+    <source src="./sounds/good.mp3" type="audio/mpeg">
   </audio>
   <audio id="audio-bad" class="audio-player" controls>
-    <source src="./sounds/Villagerdeny1.mp3" type="audio/mpeg">
+    <source src="./sounds/bad.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="audio-start" class="audio-player" controls>
+    <source src="./sounds/start.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="audio-end" class="audio-player" controls>
+    <source src="./sounds/end.mp3" type="audio/mpeg">
   </audio>
 
   <div id="navbar" style="display:none;"></div>
@@ -54,6 +61,11 @@
       </div>
 
       <div class="control">
+        <div id="countdown">
+          <h4>Time Left:</h4>
+          <input type="time" class="values" name="appt"
+       min="00:00" max="50:00" value="00:20">
+        </div>
         <button class="play eightbit-btn" id="start-game">Play</button>
       </div>
 
@@ -207,6 +219,8 @@
       $('#fps').val(`${faceapi.round(1000 / avgTimeInMs)}`)
     }
 
+    var timer = new easytimer.Timer();
+    var timeLeft = '00:20';
     var firstTime = true;
 
     async function onPlay() {
@@ -316,12 +330,60 @@
 
     }
 
+    function start() {
+      isPlaying = true;
+      $("#start-game").text('Stop');
+      $('#countdown .values').attr('disabled','disabled');
+      $('audio#audio-start')[0].play();
+      $('audio#audio-start').bind('ended', function(){
+        if (isPlaying) {
+          var t = timeLeft.split(':');
+          timer.start({countdown: true, startValues: {
+            minutes: parseInt(t[0]),
+            seconds: parseInt(t[1])
+          }});
+        }
+      });
+
+    }
+
     function stop() {
+      var audioStart = $('audio#audio-start')[0];
+      audioStart.pause();
+      audioStart.currentTime = 0;
+
+      isPlaying = false;
+      $("#start-game").text('Play');
+      timer.stop();
+      $('#countdown .values').val(timeLeft);
+
+      $('#countdown .values').removeAttr('disabled');
       $('#detections-list').html('');
       $('#pokerface-meter').width('0%');
       winning = true;
       $('.pokerface').removeClass('nop');
     }
+
+    function pad(number, length) {
+      var str = '' + number;
+      while (str.length < length) {
+        str = '0' + str;
+      }
+      return str;
+    }
+
+    timer.addEventListener('secondsUpdated', function (e) {
+      var timeValues = timer.getTimeValues();
+      $('#countdown .values').val(pad(timeValues.minutes, 2)+':'+pad(timeValues.seconds, 2));
+
+      if (timeValues.seconds <= 2 && $('audio#audio-end')[0].paused) {
+        $('audio#audio-end')[0].play();
+      }
+    });
+
+    timer.addEventListener('targetAchieved', function (e) {
+      stop();
+    });
 
     $(document).ready(function() {
       renderNavBar('#navbar', 'webcam_face_expression_recognition')
@@ -341,6 +403,11 @@
         }
       });
 
+      $('#countdown .values').change(function() {
+        timeLeft = $(this).val();
+        console.log(timeLeft);
+      });
+
       $(".more-settings").click(function() {
         $(".settings").slideToggle("fast");
       });
@@ -348,12 +415,9 @@
       $("#start-game").click(function() {
         if (isPlaying) {
           stop();
-          isPlaying = false;
-          $(this).text('Play');
         }
         else {
-          isPlaying = true;
-          $(this).text('Pause');
+          start();
         }
       });
 
