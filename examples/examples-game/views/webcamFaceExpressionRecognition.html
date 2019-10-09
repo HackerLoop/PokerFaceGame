@@ -80,6 +80,11 @@
     <div class="settings">
 
       <div class="row">
+        <label for="neutralInterval">Face expression Neutral Interval (ms):</label>
+        <input value="10" id="neutralInterval" type="number" min="0" max="100" class="bold">
+      </div>
+
+      <div class="row">
         <label for="expressionThreshold">Face expression Threshold % (biggest = hardest):</label>
         <input value="10" id="expressionThreshold" type="number" min="0" max="100" class="bold">
       </div>
@@ -285,17 +290,25 @@
     /* POKER FACE */
 
     var options = {
-      faceExpressionThreshold: 10
+      faceExpressionThreshold: 10,
+      neutralInterval: 10
     }
 
     function updateOptions() {
       options.faceExpressionThreshold = $('#expressionThreshold').val() / 100;
       $('#threshold').css({ left: (options.faceExpressionThreshold*100)+'%' });
+
+      options.neutralInterval = $('#neutralInterval').val();
     }
 
     var last_play = null;
     var isPlaying = false;
     var winning = true;
+
+    var timeInterval = Date.now();
+    var countInterval = 0;
+    var neutralSum = 0;
+    var avgNeutral = 0;
 
     function pokerface(result) {
 
@@ -303,22 +316,30 @@
         return false;
       //console.log(result);
       const expressions = result.expressions;
-      $('#pokerface-meter').width((expressions.neutral*100)+'%');
-      if (expressions.neutral <= options.faceExpressionThreshold) {
-        winning = false;
-        $('.pokerface').addClass('nop');
-        if(last_play != "bad" ) {
-          $('audio#audio-bad')[0].play();
-          last_play = "bad";
-        }
+
+      console.log("TIME: ", timeInterval - Date.now(), options.neutralInterval);
+
+      // average Neutral value
+      if (timeInterval - Date.now() <= options.neutralInterval) {
+        neutralSum += expressions.neutral;
+        countInterval++;
       }
       else {
-        winning = true;
-        $('.pokerface').removeClass('nop');
-        if(last_play != "good" ) {
-          $('audio#audio-good')[0].play();
-          last_play = "good";
-        }
+        avgNeutral = neutralSum / countInterval;
+        neutralSum = 0;
+        countInterval = 0;
+        timeInterval = Date.now();
+      }
+
+      console.log("Neutral: ", avgNeutral, expressions.neutral);
+
+      $('#pokerface-meter').width((avgNeutral*100)+'%');
+
+      if (avgNeutral <= options.faceExpressionThreshold) {
+        bad();
+      }
+      else {
+        good();
       }
 
       $('#detections-list').html('');
@@ -328,6 +349,23 @@
         }
       }
 
+      function good() {
+        winning = true;
+        $('.pokerface').removeClass('nop');
+        if(last_play != "good" ) {
+          $('audio#audio-good')[0].play();
+          last_play = "good";
+        }
+      }
+
+      function bad() {
+        winning = false;
+        $('.pokerface').addClass('nop');
+        if(last_play != "bad" ) {
+          $('audio#audio-bad')[0].play();
+          last_play = "bad";
+        }
+      }
     }
 
     function start() {
