@@ -81,7 +81,7 @@
 
       <div class="row">
         <label for="neutralInterval">Face expression Neutral Interval (ms):</label>
-        <input value="10" id="neutralInterval" type="number" min="0" max="100" class="bold">
+        <input value="200" id="neutralInterval" type="number" min="0" max="100" class="bold">
       </div>
 
       <div class="row">
@@ -291,7 +291,7 @@
 
     var options = {
       faceExpressionThreshold: 10,
-      neutralInterval: 10
+      neutralInterval: 200
     }
 
     function updateOptions() {
@@ -299,6 +299,8 @@
       $('#threshold').css({ left: (options.faceExpressionThreshold*100)+'%' });
 
       options.neutralInterval = $('#neutralInterval').val();
+
+      console.log("update Options");
     }
 
     var last_play = null;
@@ -317,15 +319,14 @@
       //console.log(result);
       const expressions = result.expressions;
 
-      console.log("TIME: ", timeInterval - Date.now(), options.neutralInterval);
 
       // average Neutral value
-      if (timeInterval - Date.now() <= options.neutralInterval) {
+      if (Date.now() - timeInterval <= options.neutralInterval) {
         neutralSum += expressions.neutral;
         countInterval++;
       }
       else {
-        avgNeutral = neutralSum / countInterval;
+        avgNeutral = (neutralSum / countInterval) || expressions.neutral;
         neutralSum = 0;
         countInterval = 0;
         timeInterval = Date.now();
@@ -368,13 +369,16 @@
       }
     }
 
+    var isStarted = false;
+
     function start() {
-      isPlaying = true;
+      isStarted = true;
       $("#start-game").text('Stop');
       $('#countdown .values').attr('disabled','disabled');
       $('audio#audio-start')[0].play();
       $('audio#audio-start').bind('ended', function(){
-        if (isPlaying) {
+        if (isStarted) {
+          isPlaying = true;
           var t = timeLeft.split(':');
           timer.start({countdown: true, startValues: {
             minutes: parseInt(t[0]),
@@ -389,7 +393,7 @@
       var audioStart = $('audio#audio-start')[0];
       audioStart.pause();
       audioStart.currentTime = 0;
-
+      isStarted = false;
       isPlaying = false;
       $("#start-game").text('Play');
       timer.stop();
@@ -429,7 +433,7 @@
       run()
 
       updateOptions();
-      $('#expressionThreshold').on('change', updateOptions);
+      $('#expressionThreshold, #neutralInterval').on('change', updateOptions);
       $(".draggableThreshold").draggable({
         axis: "x",
         containment: "#threshold-container",
