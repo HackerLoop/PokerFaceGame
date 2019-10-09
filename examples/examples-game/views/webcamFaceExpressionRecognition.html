@@ -314,8 +314,8 @@
 
     function pokerface(result) {
 
-      if (!isPlaying)
-        return false;
+      // if (!isPlaying)
+      //   return false;
       //console.log(result);
       const expressions = result.expressions;
 
@@ -353,7 +353,7 @@
       function good() {
         winning = true;
         $('.pokerface').removeClass('nop');
-        if(last_play != "good" ) {
+        if(last_play != "good" && isPlaying) {
           $('audio#audio-good')[0].play();
           last_play = "good";
         }
@@ -362,7 +362,7 @@
       function bad() {
         winning = false;
         $('.pokerface').addClass('nop');
-        if(last_play != "bad" ) {
+        if(last_play != "bad" && isPlaying) {
           $('audio#audio-bad')[0].play();
           last_play = "bad";
         }
