@@ -137,45 +137,61 @@
   background-color: #f51717;
 }
 
-  .pokerface p {
+  .pokerface .title {
     margin: 0;
   }
 
-  .meter {
-    position: relative;
-    width: 100%;
-    height: 20px;
-    background-color: white;
+.valueMeter {
+  position: relative;
+  width: 500px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  display:block;
+  vertical-align: top;
+  margin-left: 100px;
+  margin-bottom: 20px;
+}
+
+  .valueMeter-label {
+    display: block;
+    float: left;
+    font-size: 1rem;
+    line-height: 20px;
+    text-align: right;
+    width: 90px;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 20px;
+    margin-top: 0;
   }
 
-    .meter #pokerface-meter {
-      display: block;
-      background-color: black;
-      height: 100%;
-      width: 0%;
-      transition: width 100ms;
-    }
+  .valueMeter .bar {
+    display: block;
+    background-color: black;
+    height: 100%;
+    width: 0%;
+    transition: width 100ms;
+  }
 
-    #threshold {
-      display: block;
-      position: absolute;
-      top: -5px;
-      left: 0;
-      bottom: -5px;
-      background: red;
-      width: 4px;
-    }
-
-    .draggableThreshold {
-      cursor: move;
-    }
+  .valueMeter .draggable-cursor {
+    display: block;
+    position: absolute;
+    top: -5px;
+    left: 0;
+    bottom: -5px;
+    background: red;
+    width: 4px;
+    cursor: move;
+  }
 
 .audio-player {
   display: none;
 }
 
 .settings {
-  display: none;
+  /* display: none; */
 }
 
 .detections {
@@ -274,3 +290,7 @@
   #countdown .values:disabled {
     color: black;
   }
+
+.mySelect {
+  display: block;
+}

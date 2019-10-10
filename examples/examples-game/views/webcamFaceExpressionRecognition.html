@@ -43,10 +43,16 @@
   <div class="center-content page-container">
 
     <div class="pokerface">
-      <p>Poker Face</p>
-      <div class="meter" id="threshold-container">
-        <i id="pokerface-meter"></i>
-        <i id="threshold" class="draggableThreshold"></i>
+      <p class="title">Poker Face</p>
+      <p class="valueMeter-label">Neutral</p>
+      <div class="valueMeter" id="neutralThreshold">
+        <i class="bar"></i>
+        <i class="draggable-cursor"></i>
+      </div>
+      <p class="valueMeter-label">Exception</p>
+      <div class="valueMeter" id="exceptionThreshold">
+        <i class="bar"></i>
+        <i class="draggable-cursor"></i>
       </div>
     </div>
 
@@ -78,6 +84,31 @@
     </div>
     <a href="#" class="more-settings">Show more options</a>
     <div class="settings">
+
+      <br>
+
+      <div class="row side-by-side">
+
+        <div class="row">
+          <label for="expressionException">Face expression Exception (optional):</label>
+          <select id="expressionException" class="mySelect">
+            <option selected value="">disabled</option>
+            <!-- <option value="neutral">Neutral</option> -->
+            <option value="happy">Happy</option>
+            <option value="sad">Sad</option>
+            <option value="surprised">Surprised</option>
+            <option value="angry">Angry</option>
+            <option value="disgusted">Disgusted</option>
+            <option value="fearful">Fearful</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="exceptionInput">Face exception Threshold % (biggest = hardest):</label>
+          <input value="10" id="exceptionInput" type="number" min="0" max="100" class="bold">
+        </div>
+
+      </div>
 
       <div class="row">
         <label for="neutralInterval">Face expression Neutral Interval (ms):</label>
@@ -291,16 +322,9 @@
 
     var options = {
       faceExpressionThreshold: 10,
-      neutralInterval: 200
-    }
-
-    function updateOptions() {
-      options.faceExpressionThreshold = $('#expressionThreshold').val() / 100;
-      $('#threshold').css({ left: (options.faceExpressionThreshold*100)+'%' });
-
-      options.neutralInterval = $('#neutralInterval').val();
-
-      console.log("update Options");
+      faceExceptionThreshold: 10,
+      neutralInterval: 200,
+      faceException: ''
     }
 
     var last_play = null;
@@ -318,7 +342,7 @@
       //   return false;
       //console.log(result);
       const expressions = result.expressions;
-
+      var exception = options.faceException;
 
       // average Neutral value
       if (Date.now() - timeInterval <= options.neutralInterval) {
@@ -332,15 +356,32 @@
         timeInterval = Date.now();
       }
 
-      console.log("Neutral: ", avgNeutral, expressions.neutral);
+      //console.log("Neutral: ", avgNeutral, expressions.neutral);
 
-      $('#pokerface-meter').width((avgNeutral*100)+'%');
+      updateSlider('neutralThreshold', avgNeutral*100);
 
-      if (avgNeutral <= options.faceExpressionThreshold) {
-        bad();
+
+      if (exception) {
+        var valException = expressions[exception];
+        updateSlider('exceptionThreshold', valException*100);
+
+        if (
+          avgNeutral <= options.faceExpressionThreshold
+          && valException <= options.faceExceptionThreshold
+        ) {
+          bad();
+        }
+        else {
+          good();
+        }
       }
       else {
-        good();
+        if (avgNeutral <= options.faceExpressionThreshold) {
+          bad();
+        }
+        else {
+          good();
+        }
       }
 
       $('#detections-list').html('');
@@ -401,7 +442,8 @@
 
       $('#countdown .values').removeAttr('disabled');
       $('#detections-list').html('');
-      $('#pokerface-meter').width('0%');
+      updateSlider('neutralThreshold', 0);
+      updateSlider('exceptionThreshold', 0);
       winning = true;
       $('.pokerface').removeClass('nop');
     }
@@ -427,22 +469,53 @@
       stop();
     });
 
+
+    function updateOptions() {
+      options.neutralInterval = $('#neutralInterval').val();
+      console.log("neutralInterval:", options.neutralInterval);
+
+      options.faceException = $('#expressionException').val();
+      console.log("faceException:", options.faceException);
+
+      console.log("update Options");
+    }
+
+    function updateSlider(id, val) {
+      $('#'+id).find('.bar').width(val+'%');
+    }
+
+    function initSlider($elem, $input, optionName) {
+      $cursor = $elem.find('.draggable-cursor');
+      $input.on('change', function() {
+        var v = $(this).val() / 100;
+        options[optionName] = v;
+        $cursor.css({ left: (v * 100)+'%' });
+      });
+      $input.change();
+      $elem.find('.draggable-cursor').draggable({
+        axis: "x",
+        containment: '#'+$elem.attr('id'),
+        scroll: false,
+        stop: function() {
+          var posLeft = $(this).position().left / $elem.width() * 100;
+          options[optionName] = Math.round(posLeft) / 100;
+          $input.val(Math.round(posLeft));
+        }
+      });
+    }
+
     $(document).ready(function() {
       renderNavBar('#navbar', 'webcam_face_expression_recognition')
       initFaceDetectionControls()
       run()
 
       updateOptions();
-      $('#expressionThreshold, #neutralInterval').on('change', updateOptions);
-      $(".draggableThreshold").draggable({
-        axis: "x",
-        containment: "#threshold-container",
-        scroll: false,
-        stop: function() {
-          var posLeft = $(".draggableThreshold").position().left / $('#threshold-container').width() * 100;
-          options.faceExpressionThreshold = Math.round(posLeft) / 100;
-          $('#expressionThreshold').val(Math.round(posLeft));
-        }
+
+      initSlider($('#neutralThreshold'), $('#expressionThreshold'), 'faceExpressionThreshold');
+      initSlider($('#exceptionThreshold'), $('#exceptionInput'), 'faceExceptionThreshold');
+
+      $('#neutralInterval, #expressionException').change(function() {
+        updateOptions();
       });
 
       $('#countdown .values').change(function() {
