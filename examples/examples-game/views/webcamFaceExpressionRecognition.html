@@ -44,16 +44,16 @@
 
     <div class="pokerface">
       <p class="title">Poker Face</p>
-      <p class="valueMeter-label">Neutral</p>
+      <!-- <p class="valueMeter-label">Neutral</p> -->
       <div class="valueMeter" id="neutralThreshold">
         <i class="bar"></i>
         <i class="draggable-cursor"></i>
       </div>
-      <p class="valueMeter-label">Exception</p>
+      <!-- <p class="valueMeter-label">Exception</p>
       <div class="valueMeter" id="exceptionThreshold">
         <i class="bar"></i>
         <i class="draggable-cursor"></i>
-      </div>
+      </div> -->
     </div>
 
     <div class="video">
@@ -395,7 +395,7 @@
         winning = true;
         $('.pokerface').removeClass('nop');
         if(last_play != "good" && isPlaying) {
-          $('audio#audio-good')[0].play();
+          //$('audio#audio-good')[0].play();
           last_play = "good";
         }
       }
@@ -404,10 +404,19 @@
         winning = false;
         $('.pokerface').addClass('nop');
         if(last_play != "bad" && isPlaying) {
-          $('audio#audio-bad')[0].play();
+          //$('audio#audio-bad')[0].play();
+          stop();
           last_play = "bad";
         }
       }
+
+    }
+
+    function playWin() {
+      $('audio#audio-good')[0].play();
+    }
+    function playLost() {
+      $('audio#audio-bad')[0].play();
     }
 
     var isStarted = false;
@@ -442,10 +451,15 @@
 
       $('#countdown .values').removeAttr('disabled');
       $('#detections-list').html('');
-      updateSlider('neutralThreshold', 0);
-      updateSlider('exceptionThreshold', 0);
-      winning = true;
-      $('.pokerface').removeClass('nop');
+      //updateSlider('neutralThreshold', 0);
+      //updateSlider('exceptionThreshold', 0);
+
+      if(winning) {
+        playWin();
+      }
+      else {
+        playLost();
+      }
     }
 
     function pad(number, length) {
@@ -460,9 +474,9 @@
       var timeValues = timer.getTimeValues();
       $('#countdown .values').val(pad(timeValues.minutes, 2)+':'+pad(timeValues.seconds, 2));
 
-      if (timeValues.seconds <= 2 && $('audio#audio-end')[0].paused) {
-        $('audio#audio-end')[0].play();
-      }
+      // if (timeValues.seconds <= 2 && $('audio#audio-end')[0].paused) {
+      //   $('audio#audio-end')[0].play();
+      // }
     });
 
     timer.addEventListener('targetAchieved', function (e) {
