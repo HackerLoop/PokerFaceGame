@@ -466,7 +466,7 @@
 
     }
 
-    function stop() {
+    function stop(disabledMsg) {
       var audioStart = $('audio#audio-start')[0];
       audioStart.pause();
       audioStart.currentTime = 0;
@@ -481,6 +481,7 @@
       //updateSlider('neutralThreshold', 0);
       //updateSlider('exceptionThreshold', 0);
 
+      if(disabledMsg) return false;
       if(winning) {
         $('.gameResultWin').show();
         playWin();
@@ -572,7 +573,7 @@
 
       $("#start-game").click(function() {
         if (isPlaying) {
-          stop();
+          stop(true);
         }
         else {
           start();
