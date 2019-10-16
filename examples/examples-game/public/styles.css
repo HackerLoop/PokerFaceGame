@@ -1,16 +1,10 @@
-.page-container {
-  left: 0;
-  right: 0;
-  margin: auto;
-  margin-top: 20px;
-  padding-right: 200px;
+html, body {
+  margin: 0;
+  padding: 0;
 }
 
-@media only screen and (max-width : 992px) {
-  .page-container {
-    padding-left: 0;
-    display: flex !important;
-  }
+* {
+  box-sizing: border-box;
 }
 
 #navbar {
@@ -21,10 +15,12 @@
 
 .center-content {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
+
+}
+
+.page-container {
+  justify-content: left;
+  align-items: normal;
 }
 
 .side-by-side {
@@ -108,6 +104,19 @@
   display: flex;
 }
 
+
+.my-video-container {
+  position: relative;
+  padding-bottom: 0;
+  height: auto;
+  overflow: auto;
+}
+
+.my-video-container video {
+  width: 100% !important;
+  height: auto !important;
+}
+
 .video {
   position: relative;
 }
@@ -119,13 +128,13 @@
   right: 0;
 }
 
-#inputVideo {
+/* #inputVideo {
   width: 640px;
   height: 480px;
-}
+} */
 
 .pokerface {
-  width: 640px;
+  width: 100%;
   background-color: #10e886;
   font-family: 'upheaval_tt_brkregular', arial;
   font-size: 5em;
@@ -193,13 +202,11 @@
 }
 
 .settings {
-  /* display: none; */
+  display: none;
 }
 
 .detections {
-  position: absolute;
-  left: 100%;
-  top: 0;
+  text-align: center;
   font-family: 'upheaval_tt_brkregular', arial;
   font-size: 3em;
   line-height: 1em;
@@ -215,12 +222,9 @@
   }
 
 .control {
-  position: absolute;
-  top: -168px ;
-  left: 100%;
   padding: 0 14px;
-  width: 250px;
   text-align: center;
+  margin-bottom: 30px;
 }
 
 .eightbit-btn {
@@ -295,4 +299,30 @@
 
 .mySelect {
   display: block;
+}
+
+.main {
+  flex: 1;
+  padding: 30px;
+  padding-bottom: 0;
+  padding-right: 0;
+}
+
+.sidebar {
+  position: relative;
+  width: 25%;
+  overflow: hidden;
+  padding-top: 30px;
+}
+
+.gameResultWin, .gameResultLose {
+  display: none;
+  text-align: center;
+  font-family: 'upheaval_tt_brkregular', arial;
+  font-size: 2em;
+  color: #10e886;
+}
+
+.gameResultLose {
+  color: #f51717;
 }

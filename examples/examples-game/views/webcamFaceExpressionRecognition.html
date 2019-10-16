@@ -42,29 +42,37 @@
   <div id="navbar" style="display:none;"></div>
   <div class="center-content page-container">
 
-    <div class="pokerface">
-      <p class="title">Poker Face</p>
-      <!-- <p class="valueMeter-label">Neutral</p> -->
-      <div class="valueMeter" id="neutralThreshold">
-        <i class="bar"></i>
-        <i class="draggable-cursor"></i>
+    <div class="main">
+
+      <div class="pokerface">
+        <p class="title">Poker Face</p>
+        <!-- <p class="valueMeter-label">Neutral</p> -->
+        <div class="valueMeter" id="neutralThreshold">
+          <i class="bar"></i>
+          <i class="draggable-cursor"></i>
+        </div>
+        <!-- <p class="valueMeter-label">Exception</p>
+        <div class="valueMeter" id="exceptionThreshold">
+          <i class="bar"></i>
+          <i class="draggable-cursor"></i>
+        </div> -->
       </div>
-      <!-- <p class="valueMeter-label">Exception</p>
-      <div class="valueMeter" id="exceptionThreshold">
-        <i class="bar"></i>
-        <i class="draggable-cursor"></i>
-      </div> -->
+
+      <div class="video">
+
+        <div class="progress" id="loader">
+          <div class="indeterminate"></div>
+        </div>
+        <div class="my-video-container">
+          <video onloadedmetadata="onPlay(this)" id="inputVideo" autoplay muted playsinline></video>
+          <canvas id="overlay" />
+        </div>
+
+      </div>
+
     </div>
 
-    <div class="video">
-
-      <div class="progress" id="loader">
-        <div class="indeterminate"></div>
-      </div>
-      <div style="position: relative">
-        <video onloadedmetadata="onPlay(this)" id="inputVideo" autoplay muted playsinline></video>
-        <canvas id="overlay" width="640" height="480" />
-      </div>
+    <div class="sidebar">
 
       <div class="control">
         <div id="countdown">
@@ -75,6 +83,9 @@
         <button class="play eightbit-btn" id="start-game">Play</button>
       </div>
 
+      <div class="gameResultWin">You Win !</div>
+      <div class="gameResultLose">You Lose !</div>
+
       <div class="detections">
         <h4>Detections:</h4>
         <ul id="detections-list">
@@ -82,7 +93,8 @@
       </div>
 
     </div>
-    <a href="#" class="more-settings">Show more options</a>
+
+    <!-- <a href="#" class="more-settings">Show more options</a> -->
     <div class="settings">
 
       <br>
@@ -281,8 +293,10 @@
       updateTimeStats(Date.now() - ts)
 
       if (result) {
-        const canvas = $('#overlay').get(0)
-        const dims = faceapi.matchDimensions(canvas, videoEl, true)
+        const canvas = $('#overlay').get(0);
+        const $videoEl = $('#inputVideo');
+        const displaySize = { width: $videoEl.width(), height: $videoEl.height() }
+        const dims = faceapi.matchDimensions(canvas, displaySize, true);
 
         const resizedResult = faceapi.resizeResults(result, dims)
         const minConfidence = 0.05
@@ -300,6 +314,9 @@
         pokerface(result);
       }
 
+      // $('#overlay').height($('#inputVideo').height());
+      // $('#overlay').width($('#inputVideo').width());
+
       setTimeout(() => onPlay())
     }
 
@@ -311,7 +328,12 @@
 
       // try to access users webcam and stream the images
       // to the video element
-      const stream = await navigator.mediaDevices.getUserMedia({ video: {} })
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: 1920,
+          height: 1080
+        }
+      })
       const videoEl = $('#inputVideo').get(0)
       videoEl.srcObject = stream
     }
@@ -323,7 +345,7 @@
     var options = {
       faceExpressionThreshold: 10,
       faceExceptionThreshold: 10,
-      neutralInterval: 200,
+      neutralInterval: 100,
       faceException: ''
     }
 
@@ -423,6 +445,7 @@
 
     function start() {
       isStarted = true;
+      $('.gameResultWin, .gameResultLose').hide();
       $("#start-game").text('Stop');
       $('#countdown .values').attr('disabled','disabled');
       $('audio#audio-start')[0].play();
@@ -455,9 +478,11 @@
       //updateSlider('exceptionThreshold', 0);
 
       if(winning) {
+        $('.gameResultWin').show();
         playWin();
       }
       else {
+        $('.gameResultLose').show();
         playLost();
       }
     }
