@@ -94,6 +94,8 @@
 
     </div>
 
+    <div class="footer">
+
     <!-- <a href="#" class="more-settings">Show more options</a> -->
     <div class="settings">
 
@@ -247,6 +249,8 @@
         </div>
       </span>
       <!-- mtcnn_controls -->
+
+    </div>
 
     </div>
 
@@ -572,6 +576,13 @@
         }
         else {
           start();
+        }
+      });
+
+      $(document).on("keydown", function(e) {
+        var code = e.keyCode || e.which;
+        if(code == 82) { // R
+          $(".settings").slideToggle("fast");
         }
       });
 

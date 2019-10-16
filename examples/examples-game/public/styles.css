@@ -15,7 +15,7 @@ html, body {
 
 .center-content {
   display: flex;
-
+  flex-wrap: wrap;
 }
 
 .page-container {
@@ -325,4 +325,13 @@ html, body {
 
 .gameResultLose {
   color: #f51717;
+}
+
+.footer {
+  width: 50%;
+  padding: 0 30px;
+}
+
+.more-settings {
+  
 }
