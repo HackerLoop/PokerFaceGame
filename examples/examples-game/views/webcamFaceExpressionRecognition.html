@@ -23,7 +23,7 @@
   src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 </head>
-<body class="">
+<body class="ready">
   <div class="page-loader"></div>
 
   <audio id="audio-good" class="audio-player" controls>
@@ -334,8 +334,8 @@
       // to the video element
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          width: { min: 1024, ideal: 1920 },
-          height: { min: 776, ideal: 1080 }
+          width: 1440,
+          height: 900
         }
       })
       const videoEl = $('#inputVideo').get(0)
