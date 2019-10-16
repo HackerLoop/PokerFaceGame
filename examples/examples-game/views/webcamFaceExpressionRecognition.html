@@ -334,8 +334,8 @@
       // to the video element
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          width: 1920,
-          height: 1080
+          width: { min: 1024, ideal: 1920 },
+          height: { min: 776, ideal: 1080 }
         }
       })
       const videoEl = $('#inputVideo').get(0)

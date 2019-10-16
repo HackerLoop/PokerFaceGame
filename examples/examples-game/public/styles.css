@@ -302,7 +302,7 @@ html, body {
 }
 
 .main {
-  flex: 1;
+  width: 75%;
   padding: 30px;
   padding-bottom: 0;
   padding-right: 0;
@@ -333,5 +333,5 @@ html, body {
 }
 
 .more-settings {
-  
+
 }
